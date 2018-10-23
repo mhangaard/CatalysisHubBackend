@@ -14,31 +14,30 @@ If you're a member of the SUNCAT group, you can add your data to one of the fold
 
 Start by activating the corresponding virtualenv. On SHERLOCK2 ::
 
-  . /home/users/winther/data_catapp/CATKITENV/bin/activate
+  . /home/users/winther/data_catapp/CATHUBENV/bin/activate
 
 or on SUNCAT ::
 
-  . /nfs/slac/g/suncatfs/data_catapp/CATKITENV/bin/activate
+  . /nfs/slac/g/suncatfs/data_catapp/CATHUBENV/bin/activate
 
 
 
-to use the local installation of CatKit. You should see a `(CATKITENV)` at the beginning of your prompt now to indicate that all python script and libraries are first imported from the virtualenv. To return your shell to the previous state simply type::
+to use the local installation of CatHub. You should see a `(CATHUBENV)` at the beginning of your prompt now to indicate that all python script and libraries are first imported from the virtualenv. To return your shell to the previous state simply type::
 
   deactivate
 
 or log out. Now you can go straight to `cathub organize`_ .
 
-Alternatively you can install your own version of CatKit - see instructions below.
+Alternatively you can install your own version of CatHub - see instructions below.
 
 
-Installing CatKit
+Installing CatHub
 ...........................
-CatKit is set of computational tools for catalysis, that comes with a cli tool ``cathub`` that will be used to arrange your data into folders and submit your data to the server. To install CatKit, together with the ASE dependency, use pip::
+CatHub is a python module that is used to interface the Surface Reactions database of Catalysis-Hub, directly from a python script of the command line. CatHub will be used to arrange your data into folders and submit your data to the server. To install CatHub, together with the ASE dependency, use pip::
 
-  pip install --upgrade --user git+https://gitlab.com/ase/ase.git@database_lesstables#egg=ase-3.16.3b1
-  pip install --upgrade --user git+https://github.com/kirstenwinther/CatKit.git#egg=catkit
+  pip install git+https://github.com/kirstenwinther/CatHub.git#egg=cathub --upgrade --user --process-dependency-links
 
-which will install a developer version of ASE with an enhanced database module, CatKit and all their dependencies.
+which will install a developer version of ASE with an enhanced database module, CatHub and all their dependencies.
 
 To test that the cathub cli is working, start by typing::
 
@@ -48,11 +47,17 @@ And you should see a list of subcommands. If it's not working you probably have 
 
 Organizing data
 ....................
+
 You have two options for organizing your data:
 
 * cathub organize: For larger systematic datasets without reaction barriers, this approach will create folders and and arrange your data-files in the right location for you.
 
 * cathub make_folders: For smaller or more complicated datasets with reaction barriers, this method will only create your folders, and you will have to drop the files in the right location yourself.
+
+In either case no data will be uploaded to `catalysis-hub.org/publications <https://www.catalysis-hub.org/publications>`_ before you run `cathub db2server ...`.
+Once you uploaded data it will be held in a moderation stage which you can inspect yourself at `catalysis-hub.org/upload <https://www.catalysis-hub.org/upload>`_
+and delete yourself to iterate until all structures and energies look as expected. Once you are satisfied with your uploaded dataset there will be a "Release"
+button that will notify the platform administrator that the dataset is ready for release.
 
 cathub organize
 ................
@@ -91,7 +96,7 @@ If you, for example, have calculations with different facets, you can also split
 
 cathub make_folders
 ...................
-This tool will create the right folder structure for you, but you must dump your files yourself.
+An alternative to ``cathub organize``. This tool will create the right folder structure for you, but you must dump your files yourself.
 
 To learn about the make_folders command type::
 
@@ -99,39 +104,32 @@ To learn about the make_folders command type::
 
 Then create a folder in your user-name, 'cd' into it and type::
 
-  cathub make_folders --create-template <TEMPLATE>
+  cathub make_folders --create-template TEMPLATE_NAME
 
-This will create a template (txt) file, that you should update with your publication and reaction info. The template should look similar to this::
+This will create a template (txt/yaml) file, that you should update with your publication and reaction info. The template should look similar to this::
 
-    title: "The Challenge of Electrochemical Ammonia Synthesis: A New Perspective on the Role of Nitrogen Scaling Relations"
-    authors: [Montoya, Joseph H., Tsai, Charlie, Vojvodic, Aleksandra, Norskov, Jens K.]
-    journal: ChemSusChem
-    volume: 8
-    number: 13
-    pages: 2140-2267
-    year: 2015
-    publisher: Wiley
-    doi: 10.1002/cssc.201500322
-    DFT_code: Quantum Espresso
-    DFT_functionals: [BEEF-vdW]
     reactions:
-    -   reactants: [0.5H2gas, star]
-	products: [Hstar@bridge]
-    -   reactants: [0.5H2gas, star]
-	products: [Hstar@fcc]
-    -   reactants: [0.5H2gas, star]
-	products: [Hstar@hollow]
-    -   reactants: [0.5H2gas, star]
-	products: [Hstar@ontop]
-    -   Reactants: [0.5N2gas, 0.5H2gas, star]
-	products: [NHstar@bridge]
-    -   reactants: [0.5N2gas, 0.5H2gas, star]
-	products: [NHstar@hollow]
-    -   reactants: [0.5N2gas, star]
-	products: [Nstar@hollow]
-    bulk_compositions: [Co]
-    crystal_structures: [fcc]
+    -   reactants: [2.0H2Ogas, -1.5H2gas, star]
+        products: [OOHstar@top]
+    -   reactants: [CCH3star@bridge]
+        products: [Cstar@hollow, CH3star@ontop]
+    -   reactants: [CH4gas, -0.5H2gas, star]
+        products: [CH3star@ontop]
+    journal: JACS
+    year: '2017'
+    number: '1'
+    crystal_structures: [fcc, hcp]
+    volume: '1'
+    DFT_functionals: [BEEF-vdW, HSE06]
+    authors: ['Doe, John', 'Einstein, Albert']
+    pages: 23-42
+    publisher: ACS
+    doi: 10.NNNN/....
+    title: Fancy title
+    bulk_compositions: [Pt]
+    DFT_code: Quantum Espresso
     facets: ['111']
+
 
 Consult :code:`cathub make_folders --help` again for detailed instructions on how to specify the types of reactions and surfaces.
 
