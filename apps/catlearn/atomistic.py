@@ -52,9 +52,6 @@ def predict_catkit_demo(images):
     gen = FeatureGenerator(nprocs=1)
     train_fpv = default_fingerprinters(gen, 'adsorbates')
     train_fpv = [gen.mean_chemisorbed_atoms,
-                 gen.count_chemisorbed_fragment,
-                 gen.count_ads_atoms,
-                 gen.count_ads_bonds,
                  gen.ads_av,
                  gen.ads_sum,
                  gen.bulk,
@@ -71,6 +68,8 @@ def predict_catkit_demo(images):
                  gen.en_difference_chemi,
                  gen.en_difference_active,
                  gen.db_size,
+                 gen.ctime,
+                 gen.dbid,
                  gen.delta_energy]
     matrix = gen.return_vec(images, train_fpv)
 
